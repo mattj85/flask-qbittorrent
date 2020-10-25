@@ -21,49 +21,37 @@ qb.login(config.QBITUSERNAME, config.QBITPASSWORD)
 #
 @torrents.route('/api/qbt/list', methods=["GET"])
 def listTorrents():
-    try:
-        torrents = qb.torrents()
-        activeTorrents = []
-        for torrent in torrents:
-            torrentHash = torrent["hash"]
-            torrentName = torrent["name"]
-            torrentTotalSize = torrent["total_size"]
-            torrentDownloaded = torrent["completed"]
+    torrents = qb.torrents()
+    activeTorrents = []
+    for torrent in torrents:
+        torrentHash = torrent["hash"]
+        torrentName = torrent["name"]
+        torrentTotalSize = torrent["total_size"]
+        torrentDownloaded = torrent["completed"]
 
-            # downlaod finished?
-            torrentCompleted = False
-            torrentPercentage = 0
-            if torrentDownloaded == torrentTotalSize:
-                torrentCompleted = True
-                torrentPercentage = "100.00"
+        # downlaod finished?
+        torrentCompleted = False
+        torrentPercentage = 0
+        if torrentDownloaded == torrentTotalSize:
+            torrentCompleted = True
+            torrentPercentage = "100.00"
 
-            if torrentCompleted == False:
-                torrentPercentage = "{:.2f}".format(torrentDownloaded * 100 / torrentTotalSize)
+        if torrentCompleted == False:
+            torrentPercentage = "{:.2f}".format(torrentDownloaded * 100 / torrentTotalSize)
 
-            torrentObject = {"torrent_name": torrentName, "torrent_hash": torrentHash, "torrent_size": torrentTotalSize, "torrent_downloaded": torrentDownloaded, "torrent_completed": torrentCompleted, "torrent_percentage": torrentPercentage}
-            activeTorrents.append(torrentObject)
-        
-        response = make_response(
-            jsonify(
-                    {
-                        "status_code": 200,
-                        "torrents": activeTorrents
-                    }
-                ),
-                200,
-            )
-        return response
-    except Exception as e:
-        response = make_response(
+        torrentObject = {"torrent_name": torrentName, "torrent_hash": torrentHash, "torrent_size": torrentTotalSize, "torrent_downloaded": torrentDownloaded, "torrent_completed": torrentCompleted, "torrent_percentage": torrentPercentage}
+        activeTorrents.append(torrentObject)
+    
+    response = make_response(
         jsonify(
                 {
-                    "status_code": 500,
-                    "message": str(e)
+                    "status_code": 200,
+                    "torrents": activeTorrents
                 }
             ),
-            500,
+            200,
         )
-        return response
+    return response
 
 
 #
