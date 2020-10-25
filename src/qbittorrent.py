@@ -10,8 +10,8 @@ from .config import config
 torrents = Blueprint('torrents', __name__)
 
 # init torrent connection - localhost
-qb = Client("http://{}:{}".format(config.APIHOST, config.APIPORT))
-qb.login(config.USERNAME, config.PASSWORD)
+qb = Client("http://{}:{}".format(config.QBITAPIHOST, config.QBITAPIPORT))
+qb.login(config.QBITUSERNAME, config.QBITPASSWORD)
 
 #
 # torrent info
