@@ -139,6 +139,45 @@ def pauseTorrent():
         )
         return response
 
+@torrents.route('/api/qbt/resume', methods=["POST"])
+def resumeTorrent():
+    try:
+        req = request.json
+        torrentHash = req["hash"]
+
+        resumeAll = False
+        if torrentHash == "all":
+            qb.resume_all()
+            resumeAll = True
+            message = "all torrents resumed"
+
+        if not resumeAll:
+            qb.resume(torrentHash)
+            message = "torrent resumed"
+        
+        response = make_response(
+        jsonify(
+                {
+                    "status_code": 200,
+                    "message": message
+                }
+            ),
+            200,
+        )
+        return response
+        
+    except Exception as e:
+        response = make_response(
+        jsonify(
+                {
+                    "status_code": 500,
+                    "message": str(e)
+                }
+            ),
+            500,
+        )
+        return response
+
 @torrents.route('/api/qbt/delete', methods=["POST"])
 def deleteTorrent():
     try:
