@@ -3,7 +3,12 @@
 # base config file
 #
 
-APIHOST="192.168.0.254"
-APIPORT=8080
-USERNAME="admin"
-PASSWORD="adminadmin"
+# APP CONFIG
+APPHOST="localhost"
+APPPORT=5000
+
+# QBITTORRENT CONFIG
+QBITAPIHOST="localhost"
+QBITAPIPORT=8080
+QBITUSERNAME="admin"
+QBITPASSWORD="adminadmin"
