@@ -2,12 +2,14 @@
 
 from qbittorrent import Client
 from flask import Flask, json, jsonify, request, make_response, Blueprint
+from flask_cors import CORS
 
 # config
 from .config import config
 
 # register blueprint
 torrents = Blueprint('torrents', __name__)
+CORS(torrents)
 
 # init torrent connection - localhost
 qb = Client("http://{}:{}".format(config.QBITAPIHOST, config.QBITAPIPORT))
