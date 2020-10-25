@@ -13,6 +13,8 @@ torrents = Blueprint('torrents', __name__)
 qb = Client("http://{}:{}".format(config.QBITAPIHOST, config.QBITAPIPORT))
 qb.login(config.QBITUSERNAME, config.QBITPASSWORD)
 
+print(qb)
+
 #
 # torrent info
 #
