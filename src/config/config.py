@@ -3,7 +3,7 @@
 # base config file
 #
 
-APIHOST="192.168.0.254"
+APIHOST="localhost"
 APIPORT=8080
 USERNAME="admin"
 PASSWORD="adminadmin"
