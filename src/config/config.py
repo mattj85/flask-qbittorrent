@@ -16,3 +16,8 @@ QBITAPIPORT = 8080
 QBITUSERNAME = "admin"
 QBITPASSWORD = "adminadmin"
 QBITDOWNLOADPATH = "/media/plex/transmission/downloads"
+
+# PLEX
+PLEXSINTALLED = True
+PLEXFILMPATH = ""
+PLEXTVPATH = ""
