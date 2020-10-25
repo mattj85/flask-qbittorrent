@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <meta name="description" content="">
+  <meta name="author" content="">
+
+  <title>flask-qbittorrent</title>
+
+  <!-- Bootstrap core CSS -->
+  <link href="static/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+
+  <!-- font awesome -->
+  <link href="static/vendor/fontawesome/css/all.css" rel="stylesheet">
+
+  <!-- notifications -->
+  <link rel="stylesheet" href="static/vendor/notify/dist/style.css"></link>
+
+
+  <!-- Custom styles for this template -->
+  <link href="static/css/simple-sidebar.css" rel="stylesheet">
+
+</head>
+
+<body>
+
+  <div class="d-flex" id="wrapper">
+
+    <!-- Sidebar -->
+    <div class="bg-light border-right" id="sidebar-wrapper">
+      <div class="sidebar-heading">qBittorrent </div>
+      <div class="list-group list-group-flush">
+        <a href="#" class="list-group-item list-group-item-action bg-light">Dashboard</a>
+      </div>
+    </div>
+    <!-- /#sidebar-wrapper -->
+
+    <!-- Page Content -->
+    <div id="page-content-wrapper">
+
+      <nav class="navbar navbar-expand-lg navbar-light bg-light border-bottom">
+        <button class="btn btn-default" id="menu-toggle"><i class="fas fa-bars"></i></button>
+        <button type="button" class="btn btn-default" data-toggle="modal" data-target="#addTorrentModal"><i class="fas fa-plus"></i></button>
+      </nav>
+
+      <div class="container-fluid">
+        <!-- <h4 class="mt-4">Active Torrents</h4> -->
+        <!-- <br>
+        <div class="card">
+          <div class="card-body">
+            <div class="float-right">
+              <button id="all" class="btn btn-primary resume-btn"><i class="fas fa-play"></i></button>&nbsp;<button id="all" class="btn btn-warning"><i class="fas fa-pause"></i></button>&nbsp;<button id="all" class="btn btn-danger"><i class="fas fa-trash"></i></button>
+            </div>
+          </div>
+        </div> -->
+        <br>
+        <div class="active-torrents"></div>
+      </div>
+    </div>
+    <!-- /#page-content-wrapper -->
+
+  </div>
+  <!-- /#wrapper -->
+
+  <!-- add torrent modal -->
+  <div class="modal fade" id="addTorrentModal" tabindex="-1" role="dialog" aria-labelledby="modelTitleId" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">Add Magnet Link</h5>
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+              <span aria-hidden="true">&times;</span>
+            </button>
+        </div>
+        <div class="modal-body">
+          <form id="add-mgnt-frm" name="add-mgnt-frm">
+            <textarea rows="5" id="mgnt-url" style="min-width: 100%"></textarea>
+          </form>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+          <button type="button" class="btn btn-primary add-torrent-btn">Add</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Bootstrap core JavaScript -->
+  <script src="static/vendor/jquery/jquery.min.js"></script>
+  <script src="static/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+  <script src="static/vendor/notify/dist/index.var.js"></script>
+
+  <!-- Menu Toggle Script -->
+  <script>
+
+    let notifier = new AWN()
+
+    let app = {
+
+      torrents: function() {
+        $.get(`/api/qbt/list`, function(data){
+          $('.active-torrents').empty() 
+          $.each(data.torrents, function(i, v){
+            let resumeBtn = "resume-btn";
+            let torrentCompleted ;
+            if ( v.torrent_completed ) {
+              torrentCompleted = "bg-success" ;
+              resumeBtn = "disabled" ;
+            }
+            let torrentCard = `<div class="card"><div class="card-body"><h5 class="card-title">${v.torrent_name}</h5><div class="progress"><div class="progress-bar ${torrentCompleted}" role="progressbar" style="width: ${v.torrent_percentage}%" aria-valuenow="${v.torrent_percentage}" aria-valuemin="0" aria-valuemax="100">${v.torrent_percentage}%</div></div></div><div class="card-footer"><div class="float-right"><button id="${v.torrent_hash}" class="btn btn-primary resume-btn ${resumeBtn}"><i class="fas fa-play"></i></button>&nbsp;<button id="${v.torrent_hash}" class="btn btn-warning pause-btn"><i class="fas fa-pause"></i></button>&nbsp;<button id="${v.torrent_hash}" class="btn btn-danger"><i class="fas fa-trash"></i></button></div></div></div><br>` ;
+            $('.active-torrents').append(torrentCard) ;
+          })
+        })
+      },
+
+      resume: function( torrentHash ) {
+        console.log("resuming torrent: " + torrentHash)
+        $.ajax({
+            url: '/api/qbt/resume',
+            type: 'post',
+            dataType: 'json',
+            contentType: 'application/json',
+            success: function (data) {
+                console.log(data)
+                notifier.success('Download resumed')
+            },
+            data: JSON.stringify({ "hash": torrentHash })
+        });
+      },
+
+      pause: function( torrentHash ) {
+        console.log("pausing torrent: " + torrentHash)
+        $.ajax({
+            url: '/api/qbt/pause',
+            type: 'post',
+            dataType: 'json',
+            contentType: 'application/json',
+            success: function (data) {
+                console.log(data)
+                notifier.warning('Download paused')
+            },
+            data: JSON.stringify({ "hash": torrentHash })
+        });
+      },
+
+      add: function( magnet ) {
+        $.ajax({
+            url: '/api/qbt/add',
+            type: 'post',
+            dataType: 'json',
+            contentType: 'application/json',
+            success: function (data) {
+                console.log(data)
+                // refresh torrent list
+                app.torrents()
+                // close modal
+                $("#addTorrentModal").modal('hide');
+                notifier.success('Torrent added')
+            },
+            data: JSON.stringify({ "magnet": magnet })
+        });
+      }
+
+    }
+
+    // perform initial load
+    app.torrents()
+    // poll api every 10 seconds
+    setInterval(function(){ app.torrents() }, 5000)
+
+    //  handle resume
+    $(document).on('click', '.resume-btn', function () {
+      app.resume(this.id)
+    })
+
+    // handle pause
+    $(document).on('click', '.pause-btn', function () {
+      app.pause(this.id)
+    })
+
+    // add torrent
+    $(document).on('click', '.add-torrent-btn', function() {
+      if ( $('#mgnt-url').val() != "" ) {
+        app.add( $('#mgnt-url').val() )
+        return
+      }
+      alert("no magnet link")
+    })
+
+
+    // handle side bar toggle
+    $("#menu-toggle").click(function(e) {
+      e.preventDefault();
+      $("#wrapper").toggleClass("toggled");
+    });
+  </script>
+
+</body>
+
+</html>

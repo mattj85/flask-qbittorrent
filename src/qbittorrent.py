@@ -30,17 +30,32 @@ def listTorrents():
             torrentTotalSize = torrent["total_size"]
             torrentDownloaded = torrent["completed"]
 
-            # downlaod finished?
+            # default vars
+            torrentStatus = "active"
             torrentCompleted = False
             torrentPercentage = 0
+
+            # downlaod finished?
             if torrentDownloaded == torrentTotalSize:
                 torrentCompleted = True
                 torrentPercentage = "100.00"
+                torrentStatus = "complete"
 
+            # if active, calculate rough download %
             if torrentCompleted == False:
                 torrentPercentage = "{:.2f}".format(torrentDownloaded * 100 / torrentTotalSize)
 
-            torrentObject = {"torrent_name": torrentName, "torrent_hash": torrentHash, "torrent_size": torrentTotalSize, "torrent_downloaded": torrentDownloaded, "torrent_completed": torrentCompleted, "torrent_percentage": torrentPercentage}
+            # get torrent state
+            if torrent["state"] == "pausedDL":
+                torrentStatus = "paused"
+            elif torrent["state"] == "stalledUP":
+                torrentStatus = "complete"
+
+            # get torrent path
+            torrentPath = "{}{}{}".format(config.QBITDOWNLOADPATH, torrent["save_path"], torrent["name"])
+
+            # build return object
+            torrentObject = {"torrent_name": torrentName, "torrent_hash": torrentHash, "torrent_size": torrentTotalSize, "torrent_downloaded": torrentDownloaded, "torrent_completed": torrentCompleted, "torrent_percentage": torrentPercentage, "torrent_status": torrentStatus, "torrent_path": torrentPath }
             activeTorrents.append(torrentObject)
         
         response = make_response(
@@ -65,7 +80,6 @@ def listTorrents():
         )
         return response
 
-
 #
 # add torrent
 #
@@ -73,7 +87,7 @@ def listTorrents():
 def addMagnetLink():
     try:
         req = request.json
-        magnetLink = req["magnetLink"]
+        magnetLink = req["magnet"]
         qb.download_from_link(magnetLink)
         response = make_response(
         jsonify(
