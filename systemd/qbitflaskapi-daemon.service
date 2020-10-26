@@ -1,0 +1,12 @@
+[Unit]
+Description=qbittorrent flask api
+After=network.target
+
+[Service]
+User=matt
+WorkingDirectory=[SET APP DIR]
+ExecStart=python3 api.py
+Restart=always
+
+[Install]
+WantedBy=multi-user.target
