@@ -10,6 +10,8 @@ This is a flask wrapper for the python-qbittorrent module. The project came from
 
 Project runs on port 5000 and the overview page is served as the web root. Designed to be run on home LAN, no authentication currently (only to the qbittorrent API)
 
+Application configuration all done in the src/config/config.py file. You'll need to set the host for the qbittorrent-nox instance, and the download path. Plex options can be ignored for now, plex module not yet available.
+
 ### Active downloads
 ![](/images/active-downloads.png)
 
