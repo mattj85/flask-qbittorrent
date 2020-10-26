@@ -14,7 +14,7 @@ Project runs on port 5000 and the overview page is served as the web root. Desig
 ![](/images/active-downloads.png)
 
 ### Notifications
-![](/images/active-downloads.png)
+![](/images/basic-notification.png)
 
 ### Add torrent
 ![](/images/add-torrent.png)
