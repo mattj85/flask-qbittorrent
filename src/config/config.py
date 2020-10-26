@@ -3,9 +3,6 @@
 # base config file
 #
 
-# SERVER IP
-SERVERIP = "192.168.0.61"
-
 # APP CONFIG
 APPHOST = "0.0.0.0"
 APPPORT = 5000
