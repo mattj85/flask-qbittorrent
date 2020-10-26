@@ -7,3 +7,14 @@ This is a flask wrapper for the python-qbittorrent module. The project came from
 * Add torrent via magnet link or file
 * Start / pause / delete torrents
 * Basic notifications
+
+Project runs on port 5000 and the overview page is served as the web root. Designed to be run on home LAN, no authentication currently (only to the qbittorrent API)
+
+### Active downloads
+![](/images/active-downloads.png)
+
+### Notifications
+![](/images/basic-notification.png)
+
+### Add torrent
+![](/images/add-torrent.png)
