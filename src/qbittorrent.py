@@ -13,7 +13,9 @@ CORS(torrents)
 
 # init torrent connection - localhost
 qb = Client("http://{}:{}".format(config.QBITAPIHOST, config.QBITAPIPORT))
-qb.login(config.QBITUSERNAME, config.QBITPASSWORD)
+def qbitLogin():
+    qb.login(config.QBITUSERNAME, config.QBITPASSWORD)
+    return
 
 
 #
@@ -22,6 +24,7 @@ qb.login(config.QBITUSERNAME, config.QBITPASSWORD)
 @torrents.route('/api/qbt/list', methods=["GET"])
 def listTorrents():
     try:
+        qbitLogin()
         torrents = qb.torrents()
         activeTorrents = []
         for torrent in torrents:
@@ -86,6 +89,7 @@ def listTorrents():
 @torrents.route('/api/qbt/add', methods=['POST'])
 def addMagnetLink():
     try:
+        qbitLogin()
         req = request.json
         magnetLink = req["magnet"]
         qb.download_from_link(magnetLink)
@@ -117,6 +121,7 @@ def addMagnetLink():
 @torrents.route('/api/qbt/pause', methods=["POST"])
 def pauseTorrent():
     try:
+        qbitLogin()
         req = request.json
         torrentHash = req["hash"]
 
@@ -156,6 +161,7 @@ def pauseTorrent():
 @torrents.route('/api/qbt/resume', methods=["POST"])
 def resumeTorrent():
     try:
+        qbitLogin()
         req = request.json
         torrentHash = req["hash"]
 
@@ -195,6 +201,7 @@ def resumeTorrent():
 @torrents.route('/api/qbt/delete', methods=["POST"])
 def deleteTorrent():
     try:
+        qbitLogin()
         req = request.json
         torrentHash = req["hash"]
 
