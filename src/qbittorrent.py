@@ -53,6 +53,8 @@ def listTorrents():
                 torrentStatus = "paused"
             elif torrent["state"] == "stalledUP":
                 torrentStatus = "complete"
+            elif torrent["state"] == "queuedDL":
+                torrentStatus = "queued"
 
             # get torrent path
             torrentPath = "{}{}{}".format(config.QBITDOWNLOADPATH, torrent["save_path"], torrent["name"])
