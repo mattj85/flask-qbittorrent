@@ -1,5 +1,7 @@
 let notifier = new AWN()
 
+let downloadsIdArray = []
+
 let app = {
 
     torrents: function() {
@@ -11,14 +13,26 @@ let app = {
                 $('.jumbotron').show()
             }
             $.each(data.torrents, function(i, v){
-                let resumeBtn = "resume-btn";
                 let torrentCompleted ;
                 if ( v.torrent_completed ) {
                     torrentCompleted = "bg-success" ;
-                    resumeBtn = "disabled" ;
-                }
-                let torrentCard = `<div class="card"><div class="card-body"><h5 class="card-title">${v.torrent_name}</h5><div class="progress"><div class="progress-bar ${torrentCompleted}" role="progressbar progress-bar-striped progress-bar-animated" style="width: ${v.torrent_percentage}%" aria-valuenow="${v.torrent_percentage}" aria-valuemin="0" aria-valuemax="100">${v.torrent_percentage}%</div></div></div><div class="card-footer"></button>&nbsp;<button id="${v.torrent_hash}" class="btn btn-danger delete-btn"><i class="fas fa-trash"></i></button><div class="float-right"><button id="${v.torrent_hash}" class="btn btn-primary resume-btn ${resumeBtn}"><i class="fas fa-play-circle"></i></button>&nbsp;<button id="${v.torrent_hash}" class="btn btn-warning pause-btn"><i class="fas fa-pause-circle"></i></div></div></div><br>` ;
+                } 
+                let torrentCard = `<div class="card" id="card_${v.torrent_hash}"><div class="card-body"><h5 class="card-title">${v.torrent_name}</h5><div class="progress" id="progress_${v.torrent_hash}"><div class="progress-bar ${torrentCompleted}" role="progressbar progress-bar-striped progress-bar-animated" style="width: ${v.torrent_percentage}%" aria-valuenow="${v.torrent_percentage}" aria-valuemin="0" aria-valuemax="100">${v.torrent_percentage}%</div></div></div><div class="card-footer"></button>&nbsp;<button id="${v.torrent_hash}" class="btn btn-danger delete-btn"><i class="fas fa-trash"></i></button><div class="float-right"><button id="${v.torrent_hash}" class="btn btn-primary resume-btn"><i class="fas fa-play-circle"></i></button>&nbsp;<button id="${v.torrent_hash}" class="btn btn-warning pause-btn"><i class="fas fa-pause-circle"></i></div></div></div><br>` ;
                 $('.active-torrents').append(torrentCard) ;
+                downloadsIdArray.push(v.torrent_hash)
+            })
+        })
+    },
+
+    downloaded: function() {
+        $.get(`/api/qbt/list`, function(data){
+            $.each(data.torrents, function(i, v){
+                let torrentCompleted ;
+                if ( v.torrent_completed ) {
+                    torrentCompleted = "bg-success" ;
+                } 
+                let torrentProgress = `<div class="progress-bar ${torrentCompleted}" role="progressbar progress-bar-striped progress-bar-animated" style="width: ${v.torrent_percentage}%" aria-valuenow="${v.torrent_percentage}" aria-valuemin="0" aria-valuemax="100">${v.torrent_percentage}%</div>` ;
+                $('#progress_' + v.torrent_hash).empty().append(torrentProgress)
             })
         })
     },
@@ -66,6 +80,7 @@ let app = {
                 app.torrents()
                 // close modal
                 $("#addTorrentModal").modal('hide');
+                $('#mgnt-url').val("")
                 notifier.success('Torrent added')
             },
             data: JSON.stringify({ "magnet": magnet })
@@ -82,7 +97,8 @@ let app = {
             success: function (data) {
                 console.log(data)
                 notifier.warning('torrent removed')
-                app.torrents()
+                // app.torrents()
+                $('#card_' + torrentHash).slideUp()
             },
             data: JSON.stringify({ "hash": torrentHash })
         });
@@ -93,7 +109,7 @@ let app = {
 // perform initial load
 app.torrents()
 // poll api every 10 seconds
-setInterval(function(){ app.torrents() }, 10000)
+setInterval(function(){ app.downloaded() }, 5000)
 
 //  handle resume
 $(document).on('click', '.resume-btn', function () {
